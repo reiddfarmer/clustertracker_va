@@ -138,10 +138,13 @@
             <div class="cardPanel"> <!-- contains map, search, and data table -->
                 <div class="container-fluid mapBar">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-auto">
                             <button onclick="swap_countystate()" class="dropbtn mapButton" id="btn_SC">Show VA State Introductions</button>
                         </div>
-
+                        <div class="col-auto">
+                            <button class="dropbtn mapButton">Exploderate</button>
+                        </div>
+                        
                         <div class="col-auto">
                             <button class="dropbtn mapButton" id="fileInputButton">Select file</button>
                             <input type="file" id="fileInput" style="display: none;" />
@@ -164,7 +167,7 @@
                             });
                         </script>
 
-                        <div class="col">
+                        <div class="col-auto">
                                 <select id="states" name="states" onchange="this.form.submit()" class="dropbtn mapButton">
                                     <option value="" selected disabled>Choose a State</option>
                                     <option value="AL">Alabama</option> 
