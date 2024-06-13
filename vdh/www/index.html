@@ -142,7 +142,11 @@
                             <button onclick="swap_countystate()" class="dropbtn mapButton" id="btn_SC">Show VA State Introductions</button>
                         </div>
                         <div class="col-auto">
-                            <button class="dropbtn mapButton">Exploderate</button>
+                            <button class="dropbtn mapButton" id="updateButton">Update</button>
+                            <script src="scripts/parse_regions.js"></script>
+                            <script>
+                                document.getElementById('updateButton').addEventListener('click', updateJS);
+                            </script>
                         </div>
                         
                         <div class="col-auto">
