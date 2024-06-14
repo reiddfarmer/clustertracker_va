@@ -148,25 +148,34 @@
                                 document.getElementById('updateButton').addEventListener('click', updateJS);
                             </script>
                         </div>
-                        
                         <div class="col-auto">
-                            <button class="dropbtn mapButton" id="fileInputButton">Select file</button>
+                            <button class="dropbtn mapButton" id="fileInputButton">Select TSV file</button>
                             <input type="file" id="fileInput" style="display: none;" />
                         </div>
-
+                   
+                    
+                        <script src="scripts/parse_regions.js"></script>
                         <script>
-                            // JavaScript to handle the file input click
+                            let tsvFile;
+                    
                             document.getElementById('fileInputButton').addEventListener('click', function() {
                                 document.getElementById('fileInput').click();
                             });
                     
-                            // JavaScript to handle the file selection
                             document.getElementById('fileInput').addEventListener('change', function(event) {
-                                const file = event.target.files[0];
-                                if (file) {
-                                    document.getElementById('fileInputButton').textContent = 'Selected file: ' + file.name;
+                                tsvFile = event.target.files[0];
+                                if (tsvFile) {
+                                    document.getElementById('fileInputButton').textContent = 'Selected file: ' + tsvFile.name;
                                 } else {
-                                    document.getElementById('fileInputButton').textContent = 'Select file';
+                                    document.getElementById('fileInputButton').textContent = 'Select TSV file';
+                                }
+                            });
+                    
+                            document.getElementById('updateButton').addEventListener('click', () => {
+                                if (tsvFile) {
+                                    updateJS(tsvFile);
+                                } else {
+                                    alert('Please select the TSV file.');
                                 }
                             });
                         </script>
