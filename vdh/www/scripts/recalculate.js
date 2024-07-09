@@ -13,6 +13,7 @@ Possible/likely issues:
     2) State of Interest is hardcoded
     3) parseTSV uses RegEx spacing to parse instead of tab character
     4) Map requires interaction before coloring properly
+    5) State of Interest is still interactive, despite removal at end of run()
 */
 
 alert("Recalculating!"); //alert for testing
@@ -63,6 +64,7 @@ function parseTSV(file)  { //FIX: edit later on to deal with surveillance file p
     const dataMap = new Map();
 
     lines.forEach(line => {
+        if (line.substring(1) ===" ") { return; }
         const [key, value] = line.split(/\s+/);
         dataMap.set(String(key), Number(value));
     });
@@ -185,15 +187,34 @@ async function run() {
             const region = lexicon.get(fips);
             const origin = cluster[7];
             const sampleCount = currentCluster.split(',').length - 1 //Potentially takes up too much memory
-            
+
             //Assign variables to properly interact with GeoJSON structure within regions.js
-            let regionToIDMap = createLookupMap(introData);
+            var regionToIDMap = createLookupMap(introData);
             let regionID = regionToIDMap.get(region).toString();
+            let regionIndex = parseInt(regionID)-1;
+            let currentRegion = introData.features[regionIndex].properties.intros;
+
+            if (origin === "indeterminate") {
+                currentRegion["basecount"] ? currentRegion["basecount"] += sampleCount : currentRegion["basecount"] = sampleCount;
+                currentRegion[regionID] = -0.5;
+                if (monthDiff <= 12) {
+                    currentRegion["12_basecount"] ? currentRegion["12_basecount"] += sampleCount : currentRegion["12_basecount"] = sampleCount;
+                    currentRegion["12_"+regionID] = -0.5;
+                }
+                if (monthDiff <= 6) {
+                    currentRegion["6_basecount"] ? currentRegion["6_basecount"] += sampleCount : currentRegion["6_basecount"] = sampleCount;
+                    currentRegion["6_"+regionID] = -0.5;
+                }
+                if (monthDiff <= 3) {
+                    currentRegion["3_basecount"] ? currentRegion["3_basecount"] += sampleCount : currentRegion["3_basecount"] = sampleCount;
+                    currentRegion["3_"+regionID] = -0.5;
+                }
+                continue;
+            }
+
             let originID = regionToIDMap.get(origin).toString();
             let originIndex = parseInt(originID)-1;
-            let regionIndex = parseInt(regionID)-1;
             let currentOrigin = introData.features[originIndex].properties.intros;
-            let currentRegion = introData.features[regionIndex].properties.intros;
 
             //Assign or increment raw counts from origin to region
             currentOrigin["raw"+regionID] ? currentOrigin["raw"+regionID] += sampleCount : currentOrigin["raw"+regionID] = sampleCount;
@@ -233,9 +254,13 @@ async function run() {
                 currentRegion["3_"+regionID] = -0.5; //Assign default LFE from region to region
             }
         }
+        let interestStateIndex = regionToIDMap.get(stateOfInterest).toString()-1;
+        introData.features.splice(interestStateIndex, 1);
+        console.log(introData.features);
     } catch (error) { //Catch if files do not load properly
         console.error("Error loading or processing data:", error);
     }
+    alert("Recalculated!")
 }
 // Start the process
 run();
