@@ -16,7 +16,6 @@ Possible/likely issues:
     5) State of Interest is still interactive, despite removal at end of run()
 */
 
-alert("Recalculating!"); //alert for testing
 
 tsvFile = ""
 //tsvFile in function hardcoded for MVP
@@ -34,7 +33,7 @@ const workScript = `
   `;
 const url = 'https%3A%2F%2Ftaxonium.big-tree.ucsc.edu';
 
-let stateOfInterest = "Virginia"; //hardcoded for MVP
+let stateOfInterest = introData.features.splice(-1)[0].properties["ste_name"][0];
 
 //Functon that unzips and loads the 2 .json.gz files
 async function loadJSON(dataHost, taxoniumURL, file) {
@@ -58,13 +57,32 @@ async function loadJSON(dataHost, taxoniumURL, file) {
     });
 }
 
+//Function to reassign region IDs to account for the removal of state of interest within introData within regions.js
+function reassignIDs(data) {
+    arr = data.features;
+    let skippedID = -1;
+    for (let i = 0; i < arr.length; i++) {
+        if (parseInt(arr[i].id) !== i + 1) {
+            skippedID = i + 1;
+            break;
+        }
+    }
+    if (skippedID === -1) {
+        return;
+    }
+    for (let i = skippedID - 1; i < arr.length; i++) {
+        arr[i].id = (arr[i].id - 1).toString();
+    }
+}
+
+
 //Helper function that parses surveillance .tsv file from fetchTsvFile()
 function parseTSV(file)  { //FIX: edit later on to deal with surveillance file properly
     const lines = file.trim().split('\n');
     const dataMap = new Map();
 
     lines.forEach(line => {
-        if (line.substring(1) ===" ") { return; }
+        if (line.substring(1) === " ") { return; }
         const [key, value] = line.split(/\s+/);
         dataMap.set(String(key), Number(value));
     });
@@ -142,9 +160,9 @@ function sumOrigin(data, index, date) {
 }
 
 //Calculates and returns LFE, details documented in https://academic.oup.com/ve/article/8/1/veac048/6609172
-function logFoldEnrichment(data, index, date, sCount, bCount) {
-    if (sCount <= 5) { return -0.5; }
-    let iab = sCount;
+function logFoldEnrichment(data, index, date, aCount, bCount) {
+    if (aCount <= 5) { return -0.5; }
+    let iab = aCount;
     let ixx = sumCounts(data, date);
     let iax = sumOrigin(data, index, date);
     let ixb = bCount;
@@ -159,7 +177,8 @@ async function run() {
         const sampleJSON = await loadJSON('tempData/', url, 'sample_data.json.gz');
         const surveillance_table = await fetchTsvFile();
         const lexicon = await fetchTextFile();
-
+        //Reassign IDs to account for the removal of state of interest within introData within regions.js
+        reassignIDs(introData);
         iterator = -1;
         //Loop through cluster file and ignore clusters in which region is not state of interest
         for (let cluster of clusterJSON) {
@@ -173,7 +192,7 @@ async function run() {
             //Search for introduction sample within surveillance file
             const fips = surveillance_table.get(introSample);
             //Ignore and continue if introduction sample is NOT found
-            if (fips === undefined) {
+            if (fips === undefined || introSample === '') {
                 continue;
             }
             //Find difference between today's date and sample date
@@ -186,7 +205,6 @@ async function run() {
             //Extract relevant information from cluster file: region, origin, date (above), number of samples in this cluster
             const region = lexicon.get(fips);
             const origin = cluster[7];
-            const sampleCount = currentCluster.split(',').length - 1 //Potentially takes up too much memory
 
             //Assign variables to properly interact with GeoJSON structure within regions.js
             var regionToIDMap = createLookupMap(introData);
@@ -195,18 +213,18 @@ async function run() {
             let currentRegion = introData.features[regionIndex].properties.intros;
 
             if (origin === "indeterminate") {
-                currentRegion["basecount"] ? currentRegion["basecount"] += sampleCount : currentRegion["basecount"] = sampleCount;
+                currentRegion["basecount"] ? currentRegion["basecount"] += 1 : currentRegion["basecount"] = 1;
                 currentRegion[regionID] = -0.5;
                 if (monthDiff <= 12) {
-                    currentRegion["12_basecount"] ? currentRegion["12_basecount"] += sampleCount : currentRegion["12_basecount"] = sampleCount;
+                    currentRegion["12_basecount"] ? currentRegion["12_basecount"] += 1 : currentRegion["12_basecount"] = 1;
                     currentRegion["12_"+regionID] = -0.5;
                 }
                 if (monthDiff <= 6) {
-                    currentRegion["6_basecount"] ? currentRegion["6_basecount"] += sampleCount : currentRegion["6_basecount"] = sampleCount;
+                    currentRegion["6_basecount"] ? currentRegion["6_basecount"] += 1 : currentRegion["6_basecount"] = 1;
                     currentRegion["6_"+regionID] = -0.5;
                 }
                 if (monthDiff <= 3) {
-                    currentRegion["3_basecount"] ? currentRegion["3_basecount"] += sampleCount : currentRegion["3_basecount"] = sampleCount;
+                    currentRegion["3_basecount"] ? currentRegion["3_basecount"] += 1 : currentRegion["3_basecount"] = 1;
                     currentRegion["3_"+regionID] = -0.5;
                 }
                 continue;
@@ -217,9 +235,9 @@ async function run() {
             let currentOrigin = introData.features[originIndex].properties.intros;
 
             //Assign or increment raw counts from origin to region
-            currentOrigin["raw"+regionID] ? currentOrigin["raw"+regionID] += sampleCount : currentOrigin["raw"+regionID] = sampleCount;
+            currentOrigin["raw"+regionID] ? currentOrigin["raw"+regionID] += 1 : currentOrigin["raw"+regionID] = 1;
             //Assign sample basecounts to region
-            currentRegion["basecount"] ? currentRegion["basecount"] += sampleCount : currentRegion["basecount"] = sampleCount;
+            currentRegion["basecount"] ? currentRegion["basecount"] += 1 : currentRegion["basecount"] = 1;
             //Assign LFE from origin to region
             let base = currentRegion["basecount"];
             let rawcounts = currentOrigin["raw"+regionID];
@@ -228,8 +246,8 @@ async function run() {
 
             //Perform the above assignments for samples within 12 months
             if (monthDiff <= 12) {
-                currentOrigin["12_raw"+regionID] ? currentOrigin["12_raw"+regionID] += sampleCount : currentOrigin["12_raw"+regionID] = sampleCount;
-                currentRegion["12_basecount"] ? currentRegion["12_basecount"] += sampleCount : currentRegion["12_basecount"] = sampleCount;
+                currentOrigin["12_raw"+regionID] ? currentOrigin["12_raw"+regionID] += 1 : currentOrigin["12_raw"+regionID] = 1;
+                currentRegion["12_basecount"] ? currentRegion["12_basecount"] += 1 : currentRegion["12_basecount"] = 1;
                 base = currentRegion["12_basecount"];
                 rawcounts = currentOrigin["12_raw"+regionID];
                 currentOrigin["12_"+regionID] = logFoldEnrichment(introData, originIndex, "12_", rawcounts, base);
@@ -237,8 +255,8 @@ async function run() {
             }
             //Perform the above assignments for samples within 6 months
             if (monthDiff <= 6) {
-                currentOrigin["6_raw"+regionID] ? currentOrigin["6_raw"+regionID] += sampleCount : currentOrigin["6_raw"+regionID] = sampleCount;
-                currentRegion["6_basecount"] ? currentRegion["6_basecount"] += sampleCount : currentRegion["6_basecount"] = sampleCount;
+                currentOrigin["6_raw"+regionID] ? currentOrigin["6_raw"+regionID] += 1 : currentOrigin["6_raw"+regionID] = 1;
+                currentRegion["6_basecount"] ? currentRegion["6_basecount"] += 1 : currentRegion["6_basecount"] = 1;
                 base = currentRegion["6_basecount"];
                 rawcounts = currentOrigin["6_raw"+regionID];
                 currentOrigin["6_"+regionID] = logFoldEnrichment(introData, originIndex, "6_", rawcounts, base);
@@ -246,17 +264,14 @@ async function run() {
             }
             //Perform the above assignments for samples within 3 months
             if (monthDiff <= 3) {
-                currentOrigin["3_raw"+regionID] ? currentOrigin["3_raw"+regionID] += sampleCount : currentOrigin["3_raw"+regionID] = sampleCount;
-                currentRegion["3_basecount"] ? currentRegion["3_basecount"] += sampleCount : currentRegion["3_basecount"] = sampleCount;
+                currentOrigin["3_raw"+regionID] ? currentOrigin["3_raw"+regionID] += 1 : currentOrigin["3_raw"+regionID] = 1;
+                currentRegion["3_basecount"] ? currentRegion["3_basecount"] += 1 : currentRegion["3_basecount"] = 1;
                 base = currentRegion["3_basecount"];
                 rawcounts = currentOrigin["3_raw"+regionID];
                 currentOrigin["3_"+regionID] = logFoldEnrichment(introData, originIndex, "3_", rawcounts, base);
                 currentRegion["3_"+regionID] = -0.5; //Assign default LFE from region to region
             }
         }
-        let interestStateIndex = regionToIDMap.get(stateOfInterest).toString()-1;
-        introData.features.splice(interestStateIndex, 1);
-        console.log(introData.features);
     } catch (error) { //Catch if files do not load properly
         console.error("Error loading or processing data:", error);
     }
