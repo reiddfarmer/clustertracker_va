@@ -9,7 +9,7 @@ The following are necessary for the process to run properly:
     
 
 Possible/likely issues:
-    1) The code accesses the necessary files from /tempData instead of /data with soft link
+    1) The code accesses the necessary files from /recalculateData instead of /data with soft link
     2) State of Interest is hardcoded
     3) parseTSV uses RegEx spacing to parse instead of tab character
     4) Map requires interaction before coloring properly
@@ -92,7 +92,7 @@ function parseTSV(file)  { //FIX: edit later on to deal with surveillance file p
 //Function that fetches and parses surveillance .tsv file
 async function fetchTsvFile() {
     try {
-        const response = await fetch('tempData/test_surveillance.tsv');
+        const response = await fetch('recalculateData/test_surveillance.tsv');
         const data = await response.text();
         return parseTSV(data);
     } catch (error) {
@@ -116,7 +116,7 @@ function parseLexicon(file)  { //FIX, see below TO-DO
 //Function that fetches and parses lexicon.txt file
 async function fetchTextFile() { //hardcoded for now, TO-DO: refactor fetch files
     try {
-        const response = await fetch('tempData/county_lexicon.va.txt');
+        const response = await fetch('recalculateData/county_lexicon.va.txt');
         const data = await response.text();
         return parseLexicon(data);
     } catch (error) {
@@ -173,8 +173,8 @@ function logFoldEnrichment(data, index, date, aCount, bCount) {
 async function run() {
     try {
         //Load the 4 revelant files (regions.js does not require loading)
-        const clusterJSON = await loadJSON('tempData/', url, 'cluster_data.json.gz');
-        const sampleJSON = await loadJSON('tempData/', url, 'sample_data.json.gz');
+        const clusterJSON = await loadJSON('recalculateData/', url, 'cluster_data.json.gz');
+        const sampleJSON = await loadJSON('recalculateData/', url, 'sample_data.json.gz');
         const surveillance_table = await fetchTsvFile();
         const lexicon = await fetchTextFile();
         //Reassign IDs to account for the removal of state of interest within introData within regions.js
