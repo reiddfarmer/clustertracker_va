@@ -33,7 +33,7 @@ const workScript = `
   `;
 const url = 'https%3A%2F%2Ftaxonium.big-tree.ucsc.edu';
 
-let stateOfInterest = introData.features.splice(-1)[0].properties["ste_name"][0];
+let stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
 
 //Functon that unzips and loads the 2 .json.gz files
 async function loadJSON(dataHost, taxoniumURL, file) {
