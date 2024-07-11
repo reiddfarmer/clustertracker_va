@@ -288,35 +288,41 @@ function loadData(dataArr, type, taxoniumURL = '') {
     $('[data-toggle="tooltip"]').tooltip();
   });
 } // end of loadData function
+//EDIT: used globalClusters loaded in recalculate.js instead of reloading file
 async function loadBasicData(dataHost, taxoniumURL, file) {
-  const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
-  const workerUrl = URL.createObjectURL(workerBlob);
+  loadData(globalClusters, 'clusters', taxoniumURL);
+  //PREVIOUS CODE:
+  // const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
+  // const workerUrl = URL.createObjectURL(workerBlob);
 
-  const worker = new Worker(workerUrl);
+  // const worker = new Worker(workerUrl);
 
-  const compressedBlob1 = await fetch(dataHost + file + '?v=' + new Date().getTime())
-      .then((r) => r.blob());
+  // const compressedBlob1 = await fetch(dataHost + file + '?v=' + new Date().getTime())
+  //     .then((r) => r.blob());
 
-  worker.onmessage = ({data}) => {
-    const clusters = JSON.parse(new TextDecoder().decode(data));
-    loadData(clusters, 'clusters', taxoniumURL);
-  };
-  worker.postMessage(compressedBlob1);
+  // worker.onmessage = ({data}) => {
+  //   const clusters = JSON.parse(new TextDecoder().decode(data));
+  //   loadData(clusters, 'clusters', taxoniumURL);
+  // };
+  // worker.postMessage(compressedBlob1);
 }
 
+//EDIT: used globalSamples loaded in recalculate.js instead of reloading file
 async function loadSampleData(dataHost, file) {
-  const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
-  const workerUrl = URL.createObjectURL(workerBlob);
-  const worker = new Worker(workerUrl);
+  loadData(globalSamples, 'samples');
+  //PREVIOUS CODE:
+  // const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
+  // const workerUrl = URL.createObjectURL(workerBlob);
+  // const worker = new Worker(workerUrl);
 
-  const compressedBlob2 = await fetch(dataHost + file + '?v=' + new Date().getTime())
-      .then((r) => r.blob());
+  // const compressedBlob2 = await fetch(dataHost + file + '?v=' + new Date().getTime())
+  //     .then((r) => r.blob());
 
-  worker.onmessage = ({data}) => {
-    const samples = JSON.parse(new TextDecoder().decode(data));
-    loadData(samples, 'samples');
-  };
-  worker.postMessage(compressedBlob2);
+  // worker.onmessage = ({data}) => {
+  //   const samples = JSON.parse(new TextDecoder().decode(data));
+  //   loadData(samples, 'samples');
+  // };
+  // worker.postMessage(compressedBlob2);
 }
 
 // == sets up Slick Grid object properties ==

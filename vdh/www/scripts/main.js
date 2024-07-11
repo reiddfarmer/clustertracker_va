@@ -1,4 +1,4 @@
-const map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(mapCenter), mapInitialZoom);
+const map = window.map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(mapCenter), mapInitialZoom);
 // set max zoomed out extent via bounds and minZoom
 const southWest = L.latLng(-90, -179);
 const northEast = L.latLng(90, 0);
@@ -12,16 +12,18 @@ let global_state_id = '00';
 let map_colors = ['#800026', '#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976', '#FFEDA0'];
 let color_scale = 'log';
 let map_layer = 0; //0=county data, 1=state data
-let alldata =[introData, introData_us];
-let max_basecount = [0,0];
-for (j = 0; j < 2; j++) {
-    for (i = 0; i < alldata[j].features.length; i++) {
-        let bc = alldata[j].features[i]['properties']['intros']['basecount'];
-        if (bc > max_basecount[j]) {
-            max_basecount[j] = bc;
-        }
-    }
-}
+
+// Relocated following code to recalulate.js
+// let alldata =[introData, introData_us];
+// let max_basecount = [0,0];
+// for (j = 0; j < 2; j++) {
+//     for (i = 0; i < alldata[j].features.length; i++) {
+//         let bc = alldata[j].features[i]['properties']['intros']['basecount'];
+//         if (bc > max_basecount[j]) {
+//             max_basecount[j] = bc;
+//         }
+//     }
+// }
 
 
 function maxClusterCt(region_id,timel,map_layer) {
@@ -126,20 +128,21 @@ function style(feature) {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
-var geojson = [];
-geojson[0] = L.geoJson(alldata[0], {
-    style: style,
-    onEachFeature: onEachFeature
-});
-map.addLayer(geojson[0]);
-geojson[1] = L.geoJson(alldata[1], {
-    style: style,
-    onEachFeature: onEachFeature
-});
+// Relocated following code to recalulate.js
+// var geojson = [];
+// geojson[0] = L.geoJson(alldata[0], {
+//     style: style,
+//     onEachFeature: onEachFeature
+// });
+// map.addLayer(geojson[0]);
+// geojson[1] = L.geoJson(alldata[1], {
+//     style: style,
+//     onEachFeature: onEachFeature
+// });
 
 
 //control to display data for each region on hover
-var info = L.control();
+var info = window.info = L.control();
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
@@ -388,8 +391,9 @@ function getLegendBins(max) {
 }
 
 // legend for US clusters
-const legend_default = '<strong>Number of Clusters</strong><br>' +
-        getLegendBins(max_basecount[0]);
+// Relocated following code to recalulate.js
+// const legend_default = '<strong>Number of Clusters</strong><br>' +
+//         getLegendBins(max_basecount[0]);
 // legend for log fold enrichment
 const legend_log = '<strong>Introductions</strong><br>'+
          '<small>Log<sub>10</sub>fold enrichment</small><br>' + 
@@ -431,6 +435,7 @@ function onEachFeature(feature, layer) {
         click: changeView
     });
 }
+// Relocated following code to recalulate.js
+// info.addTo(map);
+// legend.addTo(map);
 
-info.addTo(map);
-legend.addTo(map);

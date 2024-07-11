@@ -16,10 +16,12 @@ Possible/likely issues:
     5) State of Interest is still interactive, despite removal at end of run()
 */
 
-
-tsvFile = ""
-//tsvFile in function hardcoded for MVP
-
+let globalSamples;
+let globalClusters;
+var alldata =[introData, introData_us];
+var max_basecount = [0,0];
+var geojson = [];
+var legend_default;
 
 //work script and url to properly load .gz files
 const workScript = `  
@@ -175,6 +177,8 @@ async function run() {
         //Load the 4 revelant files (regions.js does not require loading)
         const clusterJSON = await loadJSON('recalculateData/', url, 'cluster_data.json.gz');
         const sampleJSON = await loadJSON('recalculateData/', url, 'sample_data.json.gz');
+        globalClusters = clusterJSON;
+        globalSamples = sampleJSON;
         const surveillance_table = await fetchTsvFile();
         const lexicon = await fetchTextFile();
         //Reassign IDs to account for the removal of state of interest within introData within regions.js
@@ -274,8 +278,33 @@ async function run() {
         }
     } catch (error) { //Catch if files do not load properly
         console.error("Error loading or processing data:", error);
-    }
-    alert("Recalculated!")
+    }    
+    //The remainder of this function is code taken from main.js for initial map and legend load
+    for (j = 0; j < 2; j++) {
+        for (i = 0; i < alldata[j].features.length; i++) {
+            let bc = alldata[j].features[i]['properties']['intros']['basecount'];
+            if (bc > max_basecount[j]) {
+                max_basecount[j] = bc;
+            }
+        }   
+        }
+
+    // var geojson = [];
+    geojson[0] = L.geoJson(alldata[0], {
+        style: style,
+        onEachFeature: onEachFeature
+    });
+    map.addLayer(geojson[0]);
+    geojson[1] = L.geoJson(alldata[1], {
+        style: style,
+        onEachFeature: onEachFeature
+    });
+
+    info.addTo(map);
+    legend.addTo(map);
+    legend_default = '<strong>Number of Clusters</strong><br>' + getLegendBins(max_basecount[0]);
+    legend.update('default');
+    initCTGrid(dataHost, taxoniumHost, cDataFile, cSampleFile);
 }
 // Start the process
 run();
