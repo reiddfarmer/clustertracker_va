@@ -210,6 +210,7 @@ async function run() {
 
             //Extract relevant information from cluster file: region, origin, date (above), number of samples in this cluster
             const region = lexicon.get(fips);
+            cluster[1] = region;
             const origin = cluster[7];
 
             //Assign variables to properly interact with GeoJSON structure within regions.js
