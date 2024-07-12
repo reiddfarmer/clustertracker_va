@@ -6,14 +6,6 @@ The following are necessary for the process to run properly:
     4) county_lexicon.{state_of_interest_abbreviation}.txt
     5) State of Interest
     6) regions.js (with counties already included in GeoJSON structure)
-    
-
-Possible/likely issues:
-    1) The code accesses the necessary files from /recalculateData instead of /data with soft link
-    2) State of Interest is hardcoded
-    3) parseTSV uses RegEx spacing to parse instead of tab character
-    4) Map requires interaction before coloring properly
-    5) State of Interest is still interactive, despite removal at end of run()
 */
 
 let globalSamples;
@@ -79,14 +71,24 @@ function reassignIDs(data) {
 
 
 //Helper function that parses surveillance .tsv file from fetchTsvFile()
-function parseTSV(file)  { //FIX: edit later on to deal with surveillance file properly
+function parseTSV(file) {
     const lines = file.trim().split('\n');
     const dataMap = new Map();
 
     lines.forEach(line => {
-        if (line.substring(1) === " ") { return; }
-        const [key, value] = line.split(/\s+/);
-        dataMap.set(String(key), Number(value));
+        const parts = line.split('\t');
+        if (parts.length !== 2) {
+            return;
+        }
+        const key = parts[0].trim();
+        const value = parts[1].trim();
+
+        const isKeyValid = key.startsWith("USA/");
+        const isValueValid = /^\d+$/.test(value);
+        if (!isKeyValid || !isValueValid) {
+            return;
+        }
+        dataMap.set(key, Number(value));
     });
 
     return dataMap;
@@ -94,7 +96,7 @@ function parseTSV(file)  { //FIX: edit later on to deal with surveillance file p
 //Function that fetches and parses surveillance .tsv file
 async function fetchTsvFile() {
     try {
-        const response = await fetch('recalculateData/test_surveillance.tsv');
+        const response = await fetch('recalculateData/sample_fips.tsv');
         const data = await response.text();
         return parseTSV(data);
     } catch (error) {
