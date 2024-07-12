@@ -6,6 +6,7 @@ The following are necessary for the process to run properly:
     4) county_lexicon.{state_of_interest_abbreviation}.txt
     5) State of Interest
     6) regions.js (with counties already included in GeoJSON structure)
+    7) regions_us.js
 */
 
 let globalSamples;
@@ -177,8 +178,8 @@ function logFoldEnrichment(data, index, date, aCount, bCount) {
 async function run() {
     try {
         //Load the 4 revelant files (regions.js does not require loading)
-        const clusterJSON = await loadJSON('recalculateData/', url, 'cluster_data.json.gz');
-        const sampleJSON = await loadJSON('recalculateData/', url, 'sample_data.json.gz');
+        const clusterJSON = await loadJSON('recalculateData/', url, 'cluster_data_us.json.gz');
+        const sampleJSON = await loadJSON('recalculateData/', url, 'sample_data_us.json.gz');
         globalClusters = clusterJSON;
         globalSamples = sampleJSON;
         const surveillance_table = await fetchTsvFile();

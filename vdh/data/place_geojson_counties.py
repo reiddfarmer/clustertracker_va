@@ -1,6 +1,6 @@
 #write a script to nest counties in a given GeoJSON file inside a US level GeoJSON file
 #usage: python3 place_geojson_counties.py <US level GeoJSON file> <State Abbreviation> <US counties file>
-#example: python3 place_geojson_counties.py  --us us-states.geo.json --state va --counties georef-united-states-of-america-county.geojson
+#example: python3 place_geojson_counties.py  --us us-states.geo.json --state va --counties georef-united-states-of-america-county.geojson --remove Virginia
 
 import json
 import sys
@@ -8,6 +8,7 @@ import argparse
 DC_STATEHOOD=1
 import us as us_package
 from copy import deepcopy
+import os
 
 
 #open the US level GeoJSON file
@@ -21,6 +22,10 @@ parser.add_argument('--counties', metavar='counties', type=str, help='File conta
 parser.add_argument('--remove', metavar='remove', type=str, help='name of state to remove features from US level GeoJSON file', default=None)
 
 args = parser.parse_args()
+
+web_directory = "../www/recalculateData"
+if not os.path.exists(web_directory):
+    os.makedirs(web_directory)
 
 #Find state of interest from command line argument
 all_counties_geojson = args.counties
@@ -62,13 +67,18 @@ for feature in counties:
 #create mashup file name between US and state
 #concetenates '_counties.geojson' to state abbreviation to preserve GeoJSON format
 mashup = args.us.split('.')[0] + '_' + str(interest_state_abbr) + '-counties.geo.json'
+# mashup = os.path.join(web_directory, f'{os.path.splitext(args.us)[0]}_{str(interest_state_abbr)}-counties.geo.json')
 with open(mashup, 'w') as outfile:
     json.dump(us_map, outfile)
 
 #write a state_and_county_lexicon.{state abbreviation}.txt file in similar style to https://github.com/aswarren/clustertracker_va/blob/vdhct/vdh/data/state_and_county_lexicon.va.txt
 #Using the GeoJSON file, generates the following three column format: 1) Long County Name + State Abbreviation 2) FIPS Code 3) County name
 #open the file
-with open(f'state_and_county_lexicon.{interest_state_abbr}.txt', 'w') as f, open(f'county_lexicon.{interest_state_abbr}.txt', 'w') as f2:
+
+county_lexicon_path = os.path.join(web_directory, f'county_lexicon.{interest_state_abbr}.txt')
+
+# with open(f'state_and_county_lexicon.{interest_state_abbr}.txt', 'w') as f, open(f'county_lexicon.{interest_state_abbr}.txt', 'w') as f2:
+with open(f'state_and_county_lexicon.{interest_state_abbr}.txt', 'w') as f, open(county_lexicon_path, 'w') as f2:
     for feature in counties:
         f.write(','.join([feature['properties']['coty_name_long'][0],feature['properties']['coty_code'][0],feature['properties']['name']]) + '\n')
         f2.write(','.join([feature['properties']['coty_name_long'][0],feature['properties']['coty_code'][0],feature['properties']['name']]) + '\n')
