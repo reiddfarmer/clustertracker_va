@@ -14,6 +14,7 @@ var alldata =[introData, introData_us];
 var max_basecount = [0,0];
 var geojson = [];
 var legend_default;
+var stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
 
 //work script and url to properly load .gz files
 const workScript = `  
@@ -27,7 +28,6 @@ const workScript = `
   `;
 const url = 'https%3A%2F%2Ftaxonium.big-tree.ucsc.edu';
 
-let stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
 
 //Functon that unzips and loads the 2 .json.gz files
 async function loadJSON(dataHost, taxoniumURL, file) {
