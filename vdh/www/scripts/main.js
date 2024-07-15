@@ -360,16 +360,18 @@ function swap_countystate() {
     global_state = 'default';
     global_time = '';
     setTimeLabels(0);
-    if (btn.innerHTML == 'Show VA State Introductions') {
-        btn.innerHTML = 'Show VA County Introductions';
+    if (btn.innerHTML == 'Show State Introductions') {
+        btn.innerHTML = 'Show County Introductions';
         map.removeLayer(geojson[0]);
         map.addLayer(geojson[1]);
         map_layer = 1;
+        window.map.flyTo(stateGeographicalCenters["Kansas"], 4);
     } else {
-        btn.innerHTML = 'Show VA State Introductions';
+        btn.innerHTML = 'Show State Introductions';
         map.removeLayer(geojson[1]);
         map.addLayer(geojson[0]);
         map_layer = 0;
+        window.map.flyTo(stateGeographicalCenters[stateOfInterest], 6);
     }
     resetView();
     // load new dataset into grid
