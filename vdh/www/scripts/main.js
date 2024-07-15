@@ -1,5 +1,5 @@
 //Reassign centering of the map to state of Interest
-const stateGeographicalCenters = {
+var stateGeographicalCenters = {
     "Alabama": [32.806671, -86.791130],
     "Alaska": [61.370716, -152.404419],
     "Arizona": [33.729759, -111.431221],
@@ -52,14 +52,9 @@ const stateGeographicalCenters = {
     "Wyoming": [42.755966, -107.302490],
     "District of Columbia": [38.897438, -77.026817]
 };
+const newMapCenter = stateGeographicalCenters["Kansas"];
+const map = window.map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(newMapCenter), mapInitialZoom);
 
-if (stateOfInterest && stateGeographicalCenters[stateOfInterest]) {
-    newMapCenter = stateGeographicalCenters[stateOfInterest];
-    const map = window.map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(newMapCenter), 5.5);
-}
-else {
-    const map = window.map = L.map('mapid', {'tap': false, 'gestureHandling': true}).setView(L.latLng(mapCenter), mapInitialZoom);
-}
 // set max zoomed out extent via bounds and minZoom
 const southWest = L.latLng(-90, -179);
 const northEast = L.latLng(90, 0);
