@@ -313,6 +313,10 @@ function run() {
     //loadMap() consists of code taken from main.js for initial map and legend load
     loadMap();
     window.map.flyTo(stateGeographicalCenters[stateOfInterest], 6);
+    const button = document.getElementById('btn_SC');
+    if (button) {
+        button.style.display = 'initial';
+    }
 }
 
 async function loadFiles() {

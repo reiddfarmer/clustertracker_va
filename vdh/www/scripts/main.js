@@ -479,7 +479,7 @@ legend.update = function (props) {
             ltext = legend_log;
         }
     } else {
-        ltext = legend_default;
+        ltext = '<strong>Number of Clusters</strong><br>' + getLegendBins(max_basecount[map_layer]);
     }
     this._div.innerHTML = ltext;
 }
