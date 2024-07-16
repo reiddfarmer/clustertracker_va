@@ -60,7 +60,9 @@ for feature in counties:
     us_id += 1
     feature['id'] = us_id
     #append :{state abbreviation} to the end of the name
-    feature['properties']['coty_name_long'][0] += ":" + str(interest_state_abbr).upper()
+    feature['properties']['coty_name_long'] = feature['properties']['coty_name_long'][0]
+    feature['properties']['coty_code'] = feature['properties']['coty_code'][0]
+
     us_map['features'].append(feature)
 
 #write the new GeoJSON file
@@ -80,8 +82,8 @@ county_lexicon_path = os.path.join(web_directory, f'county_lexicon.{interest_sta
 # with open(f'state_and_county_lexicon.{interest_state_abbr}.txt', 'w') as f, open(f'county_lexicon.{interest_state_abbr}.txt', 'w') as f2:
 with open(f'state_and_county_lexicon.{interest_state_abbr}.txt', 'w') as f, open(county_lexicon_path, 'w') as f2:
     for feature in counties:
-        f.write(','.join([feature['properties']['coty_name_long'][0],feature['properties']['coty_code'][0],feature['properties']['name']]) + '\n')
-        f2.write(','.join([feature['properties']['coty_name_long'][0],feature['properties']['coty_code'][0],feature['properties']['name']]) + '\n')
+        f.write(','.join([feature['properties']['coty_name_long'],feature['properties']['coty_code'],feature['properties']['name']]) + '\n')
+        f2.write(','.join([feature['properties']['coty_name_long'],feature['properties']['coty_code'],feature['properties']['name']]) + '\n')
 
     #now write all the states in the US and their abbreviation, use python library to get the abbreviation
     for feature in us_orig['features']:

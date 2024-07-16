@@ -118,7 +118,7 @@ function parseLexicon(file)  { //FIX, see below TO-DO
 
     lines.forEach(line => {
         const fields= line.split(",");
-        dataMap.set(Number(fields[1]), String(fields[2]));
+        dataMap.set(Number(fields[1]), String(fields[0]));
     });
 
     return dataMap;
@@ -140,7 +140,10 @@ function createLookupMap(data) {
     var lookupMap = new Map();
     
     data.features.forEach(function(feature) {
-        if (feature.properties && feature.properties.name && feature.id) {
+        if (feature.properties && feature.properties.coty_name_long && feature.id) {
+            lookupMap.set(feature.properties.coty_name_long, feature.id);
+        }
+        else if (feature.properties && feature.properties.name && feature.id) {
             lookupMap.set(feature.properties.name, feature.id);
         }
     });
