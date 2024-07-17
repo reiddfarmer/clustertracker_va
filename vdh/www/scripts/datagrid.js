@@ -34,7 +34,6 @@ let filterArgs = { // grid filter arguments
     confidence: true,
     growth: true,
     samples: true,
-    pauis: true,
   },
   gridFilters: {
     minGrowth: '',
@@ -112,8 +111,6 @@ function blankSampleObj() {
   el = {
     'samples': '',
     'samplecol': '...loading data...',
-    'pauis': '',
-    'pauicol': '...loading data...',
   };
   return el;
 }
@@ -158,19 +155,8 @@ function getTaxoniumLink(taxoniumURL, cluster, ext = '') {
   link += '&zoomToSearch=0" target="_blank">View Cluster</a>';
   return link;
 }
-function getInvetigatorLink(cluster, nPauis, ext = '') {
-  let link = '<a href="https://investigator.big-tree.ucsc.edu?';
-  link += 'file=cluster_pids' + getFNameExtn() + '.json';
-  link += '&cid=' + cluster;
-  link += '" target="_blank">View ' + nPauis + ' Samples</a>';
-  return link;
-}
+
 function clusterObjs(items, taxoniumURL, ext = '') {
-  if (items[10] === 0 || items[10] === undefined) {
-    items[10] = 'No identifiable samples';
-  } else {
-    items[10] = getInvetigatorLink(items[0].toString(), items[10].toString(), ext);
-  }
   el = {
     'cid': items[0],
     'region': items[1].replace(/_/g, ' '),
@@ -183,30 +169,21 @@ function clusterObjs(items, taxoniumURL, ext = '') {
     'confidence': items[8].toString(),
     'growth': items[9].toString(),
     'taxlink': getTaxoniumLink(taxoniumURL, items[0], ext),
-    'investigator': items[10],
   };
   return el;
 }
 function sampleObjs(items) {
   // full values for searching
   const s = items[0];
-  const p = items[1];
   // truncated values for display
   let st = '';
-  let pt = '';
   if (s !== '') {
     const n = s.length <= 50 ? s.length - 1 : 50;
     st = s.slice(0, n) + '...';
   }
-  if (p !== '' && p !== undefined) {
-    const n = p.length <= 50 ? p.length - 1 : 50;
-    pt = p.slice(0, n) + '...';
-  }
   el = {
     'samples': s,
-    'pauis': p,
     'samplecol': st,
-    'pauicol': pt,
   };
   return el;
 }
@@ -235,9 +212,7 @@ function appendData(items, type, taxoniumURL = '') {
     for (let i = 0; i < sl; i++) {
       const newData = sampleObjs(items[i]);
       data[i].samples = newData.samples;
-      data[i].pauis = newData.pauis;
       data[i].samplecol = newData.samplecol;
-      data[i].pauicol = newData.pauicol;
     }
   } else if (type === 'clusters') {
     const newData = clusterObjs(items[i], taxoniumURL);
@@ -252,7 +227,7 @@ function appendData(items, type, taxoniumURL = '') {
     data[i].confidence = newData.confidence;
     data[i].growth = newData.growth;
     data[i].taxlink = newData.taxlink;
-    data[i].investigator = newData.investigator;
+    // data[i].investigator = newData.investigator;
   }
 }
 // function to load the data and wire functions to table
@@ -290,7 +265,12 @@ function loadData(dataArr, type, taxoniumURL = '') {
 } // end of loadData function
 //EDIT: used globalClusters loaded in recalculate.js instead of reloading file
 async function loadBasicData(dataHost, taxoniumURL, file) {
-  loadData(globalClusters, 'clusters', taxoniumURL);
+  if (map_layer === 0) {
+    loadData(globalClusters_county, 'clusters', taxoniumURL);
+  }
+  else {
+    loadData(globalClusters, 'clusters', taxoniumURL);
+  }
   //PREVIOUS CODE:
   // const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
   // const workerUrl = URL.createObjectURL(workerBlob);
@@ -309,7 +289,12 @@ async function loadBasicData(dataHost, taxoniumURL, file) {
 
 //EDIT: used globalSamples loaded in recalculate.js instead of reloading file
 async function loadSampleData(dataHost, file) {
-  loadData(globalSamples, 'samples');
+  if (map_layer === 0) {
+    loadData(globalSamples_county, 'samples');
+  }
+  else {
+    loadData(globalSamples, 'samples');
+  }
   //PREVIOUS CODE:
   // const workerBlob = new Blob([workerScript], {type: 'application/javascript'});
   // const workerUrl = URL.createObjectURL(workerBlob);
@@ -350,9 +335,7 @@ function setCols() {
     {id: 'confidence', name: `<span data-toggle='tooltip' title='${tooltipText[8]}'>Best Origin Regional Indices</span>`, field: 'confidence', minWidth: 75, sortable: true, sorter: sorterNumeric, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
     {id: 'growth', name: `<span data-toggle='tooltip' title='${tooltipText[9]}'>Growth Score</span>`, field: 'growth', minWidth: 70, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
     {id: 'taxlink', name: `<span data-toggle='tooltip' title='${tooltipText[10]}'>View in Taxonium</span>`, field: 'taxlink', minWidth: 70, formatter: linkFormatter, sortable: true, sorter: sorterStringCompare},
-    {id: 'investigator', name: `<span data-toggle='tooltip' title='${tooltipText[11]}'>View in Big Tree Investigator</span>`, field: 'investigator', minWidth: 120, formatter: linkFormatter, sortable: true, sorter: sorterStringCompare},
     {id: 'samplecol', name: `<span data-toggle='tooltip' title='${tooltipText[12]}'>Samples</span>`, field: 'samplecol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
-    {id: 'pauicol', name: `<span data-toggle='tooltip' title='${tooltipText[13]}'>Specimen IDs</span>`, field: 'pauicol', minWidth: 100, sortable: true, sorter: sorterStringCompare, customTooltip: {useRegularTooltip: true}, formatter: tooltipFormatter},
   ];
   return cols;
 }
@@ -383,9 +366,8 @@ const tooltipText = [
   'Regional index for the origin; 1 is maximal, 0 is minimal.',
   'Importance estimate based on cluster size and age. Not directly comparable between regions with varying sequencing levels.',
   'Click to View in Taxonium',
-  'Click to View in California Big Tree Investigator',
   'Double click cell to view all samples in this cluster',
-  'Double click cell to view all CDPH Specimen IDs or Accession Numbers for this cluster',
+  'Double click cell to view all Specimen IDs or Accession Numbers for this cluster',
 ];
 function tooltipFormatter(row, cell, value, column, dataContext) {
   let val = '';
@@ -798,10 +780,6 @@ function setGridView() {
         txt = grid.getDataItem(p.row).samples;
         txt = txt.replace(/,/g, ',<br/>');
         ttl = 'Samples';
-      } else if (p.cell === 13) {
-        txt = grid.getDataItem(p.row).pauis;
-        txt = txt.replace(/,/g, ',<br/>');
-        ttl = 'Specimen IDs';
       } else if (p.cell === 7 || p.cell === 8) {
         txt = grid.getDataItem(p.row).origin;
         const origins = txt.split(',');

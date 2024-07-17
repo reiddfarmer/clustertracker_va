@@ -67,7 +67,7 @@ let global_time = '';
 let global_state_id = '00';
 let map_colors = ['#800026', '#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976', '#FFEDA0'];
 let color_scale = 'log';
-let map_layer = 0; //0=county data, 1=state data
+var map_layer = 0; //0=county data, 1=state data
 
 // Relocated following code to recalulate.js
 // let alldata =[introData, introData_us];

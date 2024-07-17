@@ -9,8 +9,10 @@ The following are necessary for the process to run properly:
     7) regions_us.js
 */
 
-let globalSamples;
-let globalClusters;
+var globalSamples;
+var globalClusters;
+var globalSamples_county = [];
+var globalClusters_county = [];
 var alldata =[introData, introData_us];
 var max_basecount = [0,0];
 var geojson = [];
@@ -244,7 +246,10 @@ function run() {
 
         // Extract relevant information from cluster file: region, origin, date (above), number of samples in this cluster
         const region = lexicon.get(fips);
-        cluster[1] = region;
+        cluster_copy = JSON.parse(JSON.stringify(cluster));
+        cluster_copy[1] = region;
+        globalClusters_county.push(cluster_copy);
+        globalSamples_county.push(sampleJSON[iterator]);
         const origin = cluster[7];
 
         // Assign variables to properly interact with GeoJSON structure within regions.js
