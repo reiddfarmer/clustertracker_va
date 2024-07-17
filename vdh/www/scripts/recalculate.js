@@ -1,8 +1,8 @@
 /*This script is responsible for reloading the map and introductions at county-level resolution.
 The following are necessary for the process to run properly:
     1) A two-column surveillance TSV file with usherIDs and the corresponding county FIPS code
-    2) cluster_data.json.gz
-    3) sample_data.json.gz
+    2) cluster_data_us.json.gz
+    3) sample_data_us.json.gz
     4) county_lexicon.{state_of_interest_abbreviation}.txt
     5) State of Interest
     6) regions.js (with counties already included in GeoJSON structure)
@@ -31,11 +31,10 @@ const workScript = `
       self.postMessage(decompressed, [decompressed.buffer]);
     };
   `;
-const url = 'https%3A%2F%2Ftaxonium.big-tree.ucsc.edu';
 
 
 //Functon that unzips and loads the 2 .json.gz files
-async function loadJSON(dataHost, taxoniumURL, file) {
+async function loadJSON(dataHost, file) {
     const workerBlob = new Blob([workScript], {type: 'application/javascript'});
     const workerUrl = URL.createObjectURL(workerBlob);
   
@@ -330,8 +329,8 @@ function run() {
 async function loadFiles() {
     try {
         // Load the 4 relevant files (regions.js does not require loading)
-        clusterJSON = await loadJSON('recalculateData/', url, 'cluster_data_us.json.gz');
-        sampleJSON = await loadJSON('recalculateData/', url, 'sample_data_us.json.gz');
+        clusterJSON = await loadJSON('recalculateData/', 'cluster_data_us.json.gz');
+        sampleJSON = await loadJSON('recalculateData/', 'sample_data_us.json.gz');
         globalClusters = clusterJSON;
         globalSamples = sampleJSON;
         lexicon = await fetchTextFile();
