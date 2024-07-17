@@ -772,10 +772,10 @@ function setGridView() {
   // set up double click event to trigger popup
   grid.onDblClick.subscribe((e, p) => {
     // p.row, p.cell
-    if (p.cell === 12 || p.cell === 13 || p.cell === 7 || p.cell === 8) {
+    if (p.cell === 11 || p.cell === 7 || p.cell === 8) {
       let txt = '';
       let ttl = '';
-      if (p.cell === 12) {
+      if (p.cell === 11) {
         // get sample names from data
         txt = grid.getDataItem(p.row).samples;
         txt = txt.replace(/,/g, ',<br/>');
