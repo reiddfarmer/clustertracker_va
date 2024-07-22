@@ -1,6 +1,6 @@
 #write a script to nest counties in a given GeoJSON file inside a US level GeoJSON file
 #usage: python3 place_geojson_counties.py <US level GeoJSON file> <State Abbreviation> <US counties file>
-#example: python3 place_geojson_counties.py  --us us-states.geo.json --state va --counties georef-united-states-of-america-county.geojson --remove Virginia
+#example: python3 place_geojson_counties.py  --us us-states.geo.json --state va --counties georef-united-states-of-america-county.geojson
 
 import json
 import sys
@@ -18,8 +18,8 @@ parser.add_argument('--us', metavar='us', type=str, help='US level GeoJSON file'
 parser.add_argument('--state', metavar='state', type=str, help='State of interest')
 #Argument for "georef-united-states-of-america-county.geojson" file
 parser.add_argument('--counties', metavar='counties', type=str, help='File containing all US counties')
-#remove argument uses name of state to remove features from US level GeoJSON file, default is None
-parser.add_argument('--remove', metavar='remove', type=str, help='name of state to remove features from US level GeoJSON file', default=None)
+#**LINE BELOW NO LONGER WORKS. Instead, it is done automattically with --state flag
+# parser.add_argument('--remove', metavar='remove', type=str, help='name of state to remove features from US level GeoJSON file', default=None)
 
 args = parser.parse_args()
 
@@ -41,10 +41,10 @@ with open(args.us) as f, open(all_counties_geojson) as f2:
 #deep copy the us_map
 us_orig = deepcopy(us_map)
 
-# if remove is defined, remove the state from the US
-if args.remove != None:
+# Remove the state from the US if specified
+if args.state != None:
     #remove the state from the US
-    us_map['features'] = [feature for feature in us_map['features'] if feature['properties']['name'] != args.remove]
+    us_map['features'] = [feature for feature in us_map['features'] if feature['properties']['name'] != interest_state]
       
 #find relevant counties using interest_state and all_counties_geojson
 counties = []
