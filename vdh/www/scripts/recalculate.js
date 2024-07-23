@@ -17,9 +17,64 @@ var alldata =[introData, introData_us];
 var max_basecount = [0,0];
 var geojson = [];
 var legend_default;
-var stateOfInterest;
+var stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
 var clusterJSON, sampleJSON, lexicon, surveillance_table;
 var loadCounties;
+
+//State Name to Abbreviation for finding lexicon file
+const stateAbbreviations = {
+    "Alabama": "al",
+    "Alaska": "ak",
+    "Arizona": "az",
+    "Arkansas": "ar",
+    "California": "ca",
+    "Colorado": "co",
+    "Connecticut": "ct",
+    "Delaware": "de",
+    "Florida": "fl",
+    "Georgia": "ga",
+    "Hawaii": "hi",
+    "Idaho": "id",
+    "Illinois": "il",
+    "Indiana": "in",
+    "Iowa": "ia",
+    "Kansas": "ks",
+    "Kentucky": "ky",
+    "Louisiana": "la",
+    "Maine": "me",
+    "Maryland": "md",
+    "Massachusetts": "ma",
+    "Michigan": "mi",
+    "Minnesota": "mn",
+    "Mississippi": "ms",
+    "Missouri": "mo",
+    "Montana": "mt",
+    "Nebraska": "ne",
+    "Nevada": "nv",
+    "New Hampshire": "nh",
+    "New Jersey": "nj",
+    "New Mexico": "nm",
+    "New York": "ny",
+    "North Carolina": "nc",
+    "North Dakota": "nd",
+    "Ohio": "oh",
+    "Oklahoma": "ok",
+    "Oregon": "or",
+    "Pennsylvania": "pa",
+    "Rhode Island": "ri",
+    "South Carolina": "sc",
+    "South Dakota": "sd",
+    "Tennessee": "tn",
+    "Texas": "tx",
+    "Utah": "ut",
+    "Vermont": "vt",
+    "Virginia": "va",
+    "Washington": "wa",
+    "West Virginia": "wv",
+    "Wisconsin": "wi",
+    "Wyoming": "wy",
+    "District of Columbia": "dc"
+  };
 
 //work script and url to properly load .gz files
 const workScript = `  
@@ -127,8 +182,9 @@ function parseLexicon(file)  { //FIX, see below TO-DO
 
 //Function that fetches and parses lexicon.txt file
 async function fetchTextFile() { //hardcoded for now, TO-DO: refactor fetch files
+    const abbr = stateAbbreviations[stateOfInterest];
     try {
-        const response = await fetch('recalculateData/county_lexicon.va.txt');
+        const response = await fetch('recalculateData/county_lexicon.' + abbr + '.txt');
         const data = await response.text();
         return parseLexicon(data);
     } catch (error) {
@@ -212,7 +268,6 @@ function loadMap() {
 
 //Main function responsible for recalculation
 function run() {
-    stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
     // Reassign IDs to account for the removal of state of interest within introData within regions.js
     reassignIDs(introData);
 
