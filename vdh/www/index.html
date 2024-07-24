@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Cluster Tracker</title>
+        <title>Substate Cluster Tracker</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,1,0" />
@@ -24,7 +24,6 @@
         <script>
             /* Data and Map Settings */
             /* Data storage location */
-            // const dataHost = 'https://storage.googleapis.com/ucsc-gi-cdph-bigtree/display_tables/';
             const dataHost = 'recalculateData/';
             /* URL of Taxonium Link and Custom Backend */
             const taxoniumHost = 'https%3A%2F%2Ftaxonium.big-tree.ucsc.edu';
@@ -83,7 +82,7 @@
         <div id="bannerHead" class="container-fluid px-0">
             <div class="row no-gutters align-items-center">
                 <div class="col pl-3">
-                    <h1>Cluster-Tracker </h1>
+                    <h1>Substate Cluster-Tracker </h1>
                 </div>
                 <div class="col-auto pr-3">
                     <div class="dropdown">
@@ -125,9 +124,9 @@
                     <p class="pullquote"><a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker/glossary" target="_blank" class="pullquoteLink">We define a cluster as the set of sequences within a region that are inferred to result from a single introduction via travel.</a></p>
                 </div>
                 <p class="cardTitle">Welcome</p>
-                <p>The Cluster-Tracker combines sequence data from the <a data-toggle="tooltip" title="Repository containing daily-updated comprehensive global phylogenetic trees for SARS-CoV-2" target="_blank" href="https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/">global public SARS-CoV-2 phylogenetic tree</a> and sequences from a user-supplied surveillance .tsv file. When the .tsv file is supplied, Cluster-Tracker visualizes out-of-state transmission from counties of the user-specified state.
+                <p>The Substate Cluster-Tracker combines sequence data from the <a data-toggle="tooltip" title="Repository containing daily-updated comprehensive global phylogenetic trees for SARS-CoV-2" target="_blank" href="https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/">global public SARS-CoV-2 phylogenetic tree</a> and sequences from a user-supplied surveillance TSV file. When the TSV file is supplied, Substate Cluster-Tracker visualizes transmission from the US states into the counties of the user-specified state.
                 <span id="collapseAbout" class="collapse hide">
-                    The Cluster-Tracker applies a <a data-toggle="tooltip" title="Wiki page describing the heuristic calculation." target="_blank" href="https://usher-wiki.readthedocs.io/en/latest/matUtils.html#introduce">heuristic</a> to identify groups of sequences in a given region that may have recently arrived from another region. These groups may reflect cases of an infected traveler entering a region, followed by local spread. Note that biases might affect these results: relative local sequencing effort, the rate sequences arrive in repositories, and accuracy of reconstructed evolutionary relationships. 
+                    The Substate Cluster-Tracker applies a <a data-toggle="tooltip" title="Wiki page describing the heuristic calculation." target="_blank" href="https://usher-wiki.readthedocs.io/en/latest/matUtils.html#introduce">heuristic</a> to identify groups of sequences in a given region that may have recently arrived from another region. These groups may reflect cases of an infected traveler entering a region, followed by local spread. Note that biases might affect these results: relative local sequencing effort, the rate sequences arrive in repositories, and accuracy of reconstructed evolutionary relationships. 
                 </span>
                 <button id="btnShow" data-toggle="collapse" data-target="#collapseAbout" onclick="toggleBtnShow();">Show More
                     <span class="material-symbols-outlined" data-toggle="collapse" data-target="#collapseAbout">expand_more</span>
@@ -287,14 +286,6 @@
                         <th>File</th>
                         <th>Description</th>
                     </tr>
-                    <!-- <tr>
-                        <td>
-                            <a href="../data/hardcoded_clusters_us.tsv">hardcoded_clusters_us.tsv</a>
-                        </td>
-                        <td>
-                            Tab-separated file containing information for all calculated state introductions.
-                        </td>
-                    </tr> -->
                     <tr>
                         <td>
                             <a href="recalculateData/cluster_data_us.json.gz">cluster_data_us.json.gz</a>
@@ -311,14 +302,6 @@
                             JSON file containing an array of arrays, in which each inner array contains sample data corresponding to the clusters in cluster_data_us.json.
                         </td>
                     </tr>
-                    <!-- <tr>
-                        <td>
-                            <a >cview.jsonl.gz</a>
-                        </td>
-                        <td>
-                            Contains the full phylogenetic tree for the California Big Tree in a format (JSONL) suitable for viewing in the <a href="https://taxonium.org/" target="_blank">Taxonium</a> web-based or desktop-based application.
-                        </td>
-                    </tr> -->
                 </table>
             </div>
         </div>
@@ -334,7 +317,7 @@
                 </button>
               </div>
               <div class="modal-body">
-                <p>Cluster Tracker is a geo-genetic sample prioritization and investigation tool. Complex algorithms expose viral evolution to identify new introductions from outside of a focal region, allowing epidemiologists potentially to see ahead of concerning events, when a new viral variant of interest has successfully spread into their region. See our <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker/glossary" target="_blank">Glossary</a>, <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker" target="_blank">FAQ,</a> and <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker/background" target="_blank">Background</a> pages for more information.</p>
+                <p>Substate Cluster Tracker is a geo-genetic sample prioritization and investigation tool. Complex algorithms expose viral evolution to identify new introductions from outside of a focal region, allowing epidemiologists potentially to see ahead of concerning events, when a new viral variant of interest has successfully spread into their region. See our <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker/glossary" target="_blank">Glossary</a>, <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker" target="_blank">FAQ,</a> and <a href="https://pathogengenomics.ucsc.edu/tools/cluster-tracker/background" target="_blank">Background</a> pages for more information.</p>
                 <p>To identify clusters of interest:</p>
                 <ol>
                     <li>Click a county or state of interest in the map. The selected focal region will turn purple.</li>
@@ -357,7 +340,7 @@
                     <li>Once you identify a cluster of interest, you can click "View Cluster" to view that cluster in Taxonium or view the samples in the CA Big Tree Investigator.</li>
                     <ul>
                         <li>The CA Big Tree investigator (formerly known as “PAUI-Mapper” and “PHI-Join”) is a tool for rapidly identifying the set of subtrees that contain a user-specified set of samples and overlaying sample PHI information. Such sets will likely be the group of samples included in a detailed epidemiological investigation in a given region. However, we emphasize that there are many possible applications of the Big Tree Investigator platform. Once we finish establishing the link to the state’s CCRS database, this tool will seamlessly extract PHI/PII in a secure manner and format these sample data to be compatible with the Big Tree visualizations. Additionally, users can supply detailed metadata that is not contained within CCRS (e.g Epidemiological investigation notes), and our tool will correctly format this for overlay onto the tree and will produce a text-based table that joins the PHI, genome sequence information and user-supplied metadata for downstream statistical analyses.</li>
-                        <li>Taxonium is a tool to explore large phylogenetic trees. Clicking the View Cluster links in the metric table will open the Taxonium viewer and highlight a particular cluster's sequences in the California Big Tree. The California Big Tree includes sequences from the global public tree, plus those in CovidNet, and are annotated with metadata, where available, including collection date, clade, lineage, and county. In Taxonium you can search the tree and color sequences using several criteria, and switch the horizontal axis from mutation distance to time. Taxonium also includes the Treenome Browser which allows you to view each genome's mutations alongside the tree. For more details on using Taxonium, please see the <a href="https://docs.taxonium.org/en/latest/" target="_blank">Taxonium documentation</a>.</li>
+                        <li>Taxonium is a tool to explore large phylogenetic trees. Clicking the View Cluster links in the metric table will open the Taxonium viewer and highlight a particular cluster's sequences. In Taxonium you can search the tree and color sequences using several criteria, and switch the horizontal axis from mutation distance to time. Taxonium also includes the Treenome Browser which allows you to view each genome's mutations alongside the tree. For more details on using Taxonium, please see the <a href="https://docs.taxonium.org/en/latest/" target="_blank">Taxonium documentation</a>.</li>
                     </ul>
                 </ol>
               </div>
