@@ -361,6 +361,8 @@ function swap_countystate() {
     global_time = '';
     setTimeLabels(0);
     if (btn.innerHTML == 'Show State Introductions') {
+        document.getElementById('btn_intra').style.display = 'none';
+        document.getElementById('btn_intra').innerHTML = 'Show Intrastate Transmission';
         btn.innerHTML = 'Show County Introductions';
         map.removeLayer(geojson[0]);
         map.addLayer(geojson[1]);
@@ -368,6 +370,7 @@ function swap_countystate() {
         window.map.flyTo(stateGeographicalCenters["Kansas"], 4);
     } else {
         btn.innerHTML = 'Show State Introductions';
+        document.getElementById('btn_intra').style.display = 'initial';
         map.removeLayer(geojson[1]);
         map.addLayer(geojson[0]);
         map_layer = 0;
@@ -375,6 +378,38 @@ function swap_countystate() {
     }
     resetView();
     // load new dataset into grid
+    let df = cDataFile;
+    let ds = cSampleFile;
+    if (map_layer == 1) {
+        const ext = '_us';
+        let pos = cDataFile.length - 8;
+        df = cDataFile.substring(0, pos) + ext + cDataFile.substring(pos);
+        pos = cSampleFile.length - 8;
+        ds = cSampleFile.substring(0, pos) + ext + cSampleFile.substring(pos);
+    }
+    initCTGrid(dataHost, taxoniumHost, df, ds);
+}
+
+function show_intra() {
+    var btn = document.getElementById('btn_intra');
+    color_scale = 'log';
+    global_state = 'default';
+    global_time = '';
+    setTimeLabels(0);
+    if (btn.innerHTML == 'Show Intrastate Transmission') {
+        btn.innerHTML = 'Show All Transmission';
+        map.removeLayer(geojson[0]);
+        map.addLayer(geojson[2]);
+        map_layer = 2;
+        window.map.flyTo(stateGeographicalCenters[stateOfInterest], 5);
+    } else {
+        btn.innerHTML = 'Show Intrastate Transmission';
+        map.removeLayer(geojson[2]);
+        map.addLayer(geojson[0]);
+        map_layer = 1;
+        window.map.flyTo(stateGeographicalCenters[stateOfInterest], 4);
+    }
+    resetView();
     let df = cDataFile;
     let ds = cSampleFile;
     if (map_layer == 1) {

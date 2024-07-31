@@ -13,8 +13,8 @@ var globalSamples;
 var globalClusters;
 var globalSamples_county = [];
 var globalClusters_county = [];
-var alldata =[introData, introData_us];
-var max_basecount = [0,0];
+var alldata =[introData, introData_us, introData_inter];
+var max_basecount = [0,0,0];
 var geojson = [];
 var legend_default;
 var stateOfInterest = introData.features.slice(-1)[0].properties["ste_name"][0];
@@ -241,6 +241,10 @@ function loadMap() {
         style: style,
         onEachFeature: onEachFeature
     });
+    geojson[2] = L.geoJson(alldata[2], {
+        style: style,
+        onEachFeature: onEachFeature
+    });
 
     info.addTo(map);
     legend.addTo(map);
@@ -249,11 +253,12 @@ function loadMap() {
     initCTGrid(dataHost, taxoniumHost, cDataFile, cSampleFile);
 }
 
-// function createModeVariables() {
-//     for (let node of introData.features) {
-
-//     }
-// }
+function createModeVariables() {
+    for (let node of introData.features) {
+        if (node['properties']['ste_name'])
+            introData_inter['features'].push(node)
+    }
+}
 
 //Main function responsible for recalculation
 function run() {
@@ -358,7 +363,8 @@ function run() {
             currentRegion["3_" + regionID] = -0.5; // Assign default LFE from region to region
         }
     }
-    // createModeVariables();
+    createModeVariables();
+    document.getElementById('btn_intra').style.display = 'initial';
     //loadMap() consists of code taken from main.js for initial map and legend load
     loadMap();
     window.map.flyTo(stateGeographicalCenters[stateOfInterest], 6);
