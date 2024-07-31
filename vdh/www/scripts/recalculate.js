@@ -110,23 +110,6 @@ async function loadJSON(dataHost, file) {
     });
 }
 
-//Function to reassign region IDs to account for the removal of state of interest within introData within regions.js
-function reassignIDs(data) {
-    arr = data.features;
-    let skippedID = -1;
-    for (let i = 0; i < arr.length; i++) {
-        if (parseInt(arr[i].id) !== i + 1) {
-            skippedID = i + 1;
-            break;
-        }
-    }
-    if (skippedID === -1) {
-        return;
-    }
-    for (let i = skippedID - 1; i < arr.length; i++) {
-        arr[i].id = (arr[i].id - 1).toString();
-    }
-}
 
 
 //Helper function that parses surveillance .tsv file from fetchTsvFile()
@@ -266,11 +249,14 @@ function loadMap() {
     initCTGrid(dataHost, taxoniumHost, cDataFile, cSampleFile);
 }
 
+// function createModeVariables() {
+//     for (let node of introData.features) {
+
+//     }
+// }
+
 //Main function responsible for recalculation
 function run() {
-    // Reassign IDs to account for the removal of state of interest within introData within regions.js
-    reassignIDs(introData);
-
     iterator = -1;
     // Loop through cluster file and ignore clusters in which region is not state of interest
     for (let cluster of clusterJSON) {
@@ -372,6 +358,7 @@ function run() {
             currentRegion["3_" + regionID] = -0.5; // Assign default LFE from region to region
         }
     }
+    // createModeVariables();
     //loadMap() consists of code taken from main.js for initial map and legend load
     loadMap();
     window.map.flyTo(stateGeographicalCenters[stateOfInterest], 6);

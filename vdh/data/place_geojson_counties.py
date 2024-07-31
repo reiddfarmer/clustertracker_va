@@ -41,16 +41,25 @@ with open(args.us) as f, open(all_counties_geojson) as f2:
 #deep copy the us_map
 us_orig = deepcopy(us_map)
 
-# Remove the state from the US if specified
+#Remove the state from the US if specified AND decrement following IDs to fill in gap
 if args.state != None:
-    #remove the state from the US
-    us_map['features'] = [feature for feature in us_map['features'] if feature['properties']['name'] != interest_state]
+    id_offset = 0
+    i = 0
+    while i < len(us_map['features']):
+        feature = us_map['features'][i]
+        if feature['properties']['name'] == interest_state:
+            del us_map['features'][i]  #remove the feature with the interest_state
+            id_offset = -1  #set the offset to -1 once the state is removed
+        else:
+            feature['id'] += id_offset  
+            i += 1 
+
       
 #find relevant counties using interest_state and all_counties_geojson
 counties = []
 for feature in all_counties['features']:
     if feature['properties']['ste_name'][0] == interest_state:
-        feature["properties"]["name"] = feature["properties"].pop("coty_name")[0]
+        feature["properties"]["name"] = feature["properties"]["coty_name_long"][0]
         counties.append(feature)
 
 #get the id of the last US feature
